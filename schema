@@ -1,0 +1,14 @@
+Rooms:
+    ID
+    Owner
+    List of users
+    Round
+    Active
+    Winner
+
+Users:
+    ID
+    List of Rooms
+
+Messages:
+    
