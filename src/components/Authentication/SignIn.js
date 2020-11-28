@@ -1,3 +1,6 @@
+import GoogleButton from 'react-google-button'
+
+import './authentication.css';
 import firebase, { auth } from '../../firebase.js';
 
 function SignIn() {
@@ -8,9 +11,9 @@ function SignIn() {
     }
   
     return (
-      <>
-        <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
-      </>
+      <div className="sign-in-div">
+        <GoogleButton className="sign-in" id="customBtn" onClick={signInWithGoogle} />
+      </div>
     )
   
   }

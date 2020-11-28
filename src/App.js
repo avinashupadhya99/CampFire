@@ -7,6 +7,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import SignIn from './components/Authentication/SignIn';
+import Landing from './components/Room/Landing';
 
 const firestore = firebase.firestore();
 
@@ -16,18 +17,11 @@ function App() {
 
   return (
     <div className="App">
-      Camp Fire
-      {user ? <LoggedIn /> : <SignIn />}
+      {user ? <Landing /> : <SignIn />}
     </div>
   );
 }
 
-function LoggedIn() {
-  return(
-    <>
-      Logged In
-    </>
-  )
-}
+
 
 export default App;
