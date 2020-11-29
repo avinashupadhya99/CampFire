@@ -10,7 +10,6 @@ import { auth, db } from '../../firebase';
 function Landing () {
     return (
         <>
-            
             <SignOut />
             <br/>
             <Button variant="warning">Join a Room</Button> OR <Button variant="warning" onClick={createRoom}>Create a room</Button>

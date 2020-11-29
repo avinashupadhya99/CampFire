@@ -9,12 +9,12 @@ import SignIn from './components/Authentication/SignIn';
 import Landing from './components/Room/Landing';
 import Room from './components/Room/Room';
 
+let currentUser;
 
 function App() {
 
   const [user] = useAuthState(auth);
-
-  console.log(user ? user.roomID: 'no user');
+  currentUser = user;
 
   return (
     <Router>
@@ -35,21 +35,24 @@ function App() {
   );
 }
 
-function SecureRoute({ children, ...rest }) {
-  const user = auth.currentUser;
-  return (
-    <Route
-      {...rest}
-      render={() =>
-        user ? (
-          children
-        ) : (
-          <SignIn />
-        )
-      }
-    />
-  );
-}
+// function SecureRoute({ component: Component, ...rest }) {
+//   auth.onAuthStateChanged(user=> {
+//     return (
+//       <Route
+//         {...rest}
+//         render={(props) =>
+//           user ? (
+//             <Component {...props} />
+//           ) : (
+//             <Redirect to={"/"} />
+//           )
+//         }
+//       />
+//     );
+//   });
+  
+// }
+
 
 
 export default App;
