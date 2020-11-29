@@ -1,5 +1,6 @@
-import { Button } from 'react-bootstrap';
+import { Alert, Button, Form, Modal, Spinner } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import SignOut from '../Authentication/Signout'
 import Room from './Room';
@@ -8,11 +9,94 @@ import { auth, db } from '../../firebase';
 
 
 function Landing () {
+    const [user, setUser] = useState(null);
+    const [modalShow, setModalShow] = useState(false);
+    const [room, setRoom] = useState({ roomcode: '' });
+    const [showLoading, setShowLoading] = useState(false);
+    const [showWaiting, setShowWaiting] = useState(false);
+    const [error, setError] = useState({show: false, message: ''});
+    const [authError, setAuthError] = useState(false);
+    const roomRef = db.collection("rooms");
+
+    const handleModalClose = () => setModalShow(false);
+    const handleModalShow = () => setModalShow(true);
+
+    useEffect(() => {
+        auth.onAuthStateChanged(user=> {
+            setUser(user);
+            if(!user) {
+                setAuthError(true);
+            }
+        })
+    });
+    
+    const join = (e) => {
+        e.preventDefault();
+        setModalShow(false);
+        setShowLoading(true);
+        roomRef.doc(room.roomcode).get()
+        .then(roomDoc => {
+            if(roomDoc.exists) {
+                roomRef.doc(room.roomcode).collection("requests").doc(user.uid).set({})
+                .then(() => {
+                    setShowLoading(false);
+                    setShowWaiting(true);
+                }).catch(reqError => {
+                    console.error(reqError);
+                    setShowLoading(false);
+                    setError({show:true, message: "An error occurred while sending request. Please try again"});
+                });
+            } else {
+                setShowLoading(false);
+                setError({show:true, message: "Room does not exists. Please try again"});
+            }
+        }).catch(err => {
+            console.log(err);
+            setShowLoading(false);
+            setError({show:true, message: "An error occurred. Please try again"});
+        })
+
+    };
+
+    const onChange = (e) => {
+        e.persist();
+        setRoom({...room, [e.target.name]: e.target.value});
+    };
+
     return (
         <>
+            {authError &&
+                <Redirect to={"/"} />
+            }
+            {showLoading &&
+                <Spinner className="vertical-center"  animation="border" variant="primary" />
+            }
+            {showWaiting &&
+                <Alert className="vertical-center" variant="success">Please wait for the room owner to accept you</Alert>
+            }
+            {error.show &&
+                <Alert className="vertical-center" variant="danger">{error.message}</Alert>
+            }
             <SignOut />
             <br/>
-            <Button variant="warning">Join a Room</Button> OR <Button variant="warning" onClick={createRoom}>Create a room</Button>
+            <Button variant="warning" onClick={handleModalShow}>Join a Room</Button> OR <Button variant="warning" onClick={createRoom}>Create a room</Button>
+
+            <Modal show={modalShow} onHide={handleModalClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Join a room</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={join}>
+                        <Form.Group>
+                            <Form.Label>Room Code</Form.Label>
+                            <Form.Control type="text" name="roomcode" id="roomcode" placeholder="Enter Room Code" value={room.roomcode} onChange={onChange} />
+                        </Form.Group>
+                        <Button variant="primary" type="submit">
+                            Join
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

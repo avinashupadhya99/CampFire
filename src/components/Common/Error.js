@@ -1,5 +1,5 @@
 
-function Error(props) {
+function Error() {
     return(
         <div>
             Oops! Something went wrong
